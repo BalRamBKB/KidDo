@@ -13,21 +13,23 @@ import LessonsContainer from './components/LessonsContainer';
 import WordGame from './components/WordGame';
 import TrophyRoom from './components/TrophyRoom';
 import MathSprint from './components/MathSprint';
+import SpellingBee from './components/SpellingBee';
+import ClockMaster from './components/ClockMaster';
 
 export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
-  
+
   // 🔐 Authentication & Profile States
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState('Explorer');
-  
+
   // Dashboard & Tracking States
   const [score, setScore] = useState(350);
   const [streak, setStreak] = useState(4);
   const [selectedLessonSubject, setSelectedLessonSubject] = useState('Math');
-const [currentGame, setCurrentGame] = useState('menu'); // 'menu', 'scramble', or 'math'
-  
+  const [currentGame, setCurrentGame] = useState('menu'); // 'menu', 'scramble', or 'math'
+
   const [tasks, setTasks] = useState([
     { id: 1, title: 'Read 1 Story Book Chapter', points: 50, emoji: '📖', completed: false },
     { id: 2, title: 'Finish Magic Math Level 2', points: 100, emoji: '🔢', completed: false },
@@ -83,24 +85,24 @@ const [currentGame, setCurrentGame] = useState('menu'); // 'menu', 'scramble', o
 
   if (!isLoggedIn) {
     return (
-      <AuthScreen 
+      <AuthScreen
         onLoginSuccess={(kidName) => {
           setUserName(kidName);
           setIsLoggedIn(true);
-        }} 
+        }}
       />
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-indigo-50/20 to-emerald-50/40 text-slate-800 font-sans antialiased">
-      
+
       {/* MOBILE NAVBAR HEADER */}
       <header className="lg:hidden bg-white border-b-4 border-slate-100 px-4 py-3 flex justify-between items-center sticky top-0 z-50">
         <span className="bg-amber-400 text-white font-black text-lg px-3 py-1 rounded-xl shadow-sm">✨ KidDo</span>
         <div className="flex items-center gap-2">
-          <button 
-            onClick={handleLogout} 
+          <button
+            onClick={handleLogout}
             className="p-2 bg-rose-50 text-rose-500 rounded-xl hover:bg-rose-100 transition-colors"
             title="Log Out"
           >
@@ -156,7 +158,7 @@ const [currentGame, setCurrentGame] = useState('menu'); // 'menu', 'scramble', o
                 <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-xl shadow-inner">🦊</div>
                 <div className="min-w-0">
                   <h4 className="font-bold truncate text-sm">{userName}</h4>
-                  <p className="text-[10px] text-purple-100 flex items-center gap-0.5"><Star size={10} fill="currentColor"/> Explorer Lvl {Math.floor(score / 300) + 1}</p>
+                  <p className="text-[10px] text-purple-100 flex items-center gap-0.5"><Star size={10} fill="currentColor" /> Explorer Lvl {Math.floor(score / 300) + 1}</p>
                 </div>
               </div>
             </div>
@@ -171,28 +173,28 @@ const [currentGame, setCurrentGame] = useState('menu'); // 'menu', 'scramble', o
           </div>
         </aside>
 
-       {/* VIEW ROUTER BODY WRAPPER CONTAINER */}
+        {/* VIEW ROUTER BODY WRAPPER CONTAINER */}
         <main className="flex-1 max-h-screen overflow-y-auto w-full bg-gradient-to-b from-amber-50/60 via-indigo-50/20 to-emerald-50/40 flex flex-col justify-between">
-          
+
           {/* TOP PART: ALL ACTIVE CONTENT VIEWS */}
           <div className="p-4 sm:p-6 lg:p-8 flex-1">
             {activeTab === 'dashboard' && (
               <div className="space-y-6 max-w-7xl mx-auto">
                 <WelcomeBanner kidName={userName} />
                 <ProgressCards currentScore={score} currentStreak={streak} completedCount={completedCount} />
-                
+
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div className="lg:col-span-2 space-y-6">
                     <InteractiveTasks tasks={tasks} onToggleTask={handleToggleTask} />
-                    <LessonGrid 
-                      lessons={lessons} 
+                    <LessonGrid
+                      lessons={lessons}
                       onJumpToLessons={(subjectId) => {
                         setSelectedLessonSubject(subjectId);
                         setActiveTab('lessons');
-                      }} 
+                      }}
                     />
                   </div>
-                  
+
                   <div className="space-y-6">
                     <RewardChest totalTasks={tasks.length} completedTasks={completedCount} />
                     <Achievements earnedBadges={earnedBadges} onJumpToAwards={() => setActiveTab('awards')} />
@@ -207,90 +209,131 @@ const [currentGame, setCurrentGame] = useState('menu'); // 'menu', 'scramble', o
                   <span className="font-black text-lg">🏫 Homework Explorer Academy</span>
                   <span className="bg-white/20 backdrop-blur-md text-white font-extrabold px-3 py-1 rounded-full text-sm">🌟 {score} pts</span>
                 </div>
-                <LessonsContainer 
+                <LessonsContainer
                   key={selectedLessonSubject}
-                  initialSubject={selectedLessonSubject} 
-                  onAwardPoints={(subj, cardIdx, total, pts) => handleAwardLessonPoints(subj, cardIdx, total, pts)} 
+                  initialSubject={selectedLessonSubject}
+                  onAwardPoints={(subj, cardIdx, total, pts) => handleAwardLessonPoints(subj, cardIdx, total, pts)}
                 />
               </div>
             )}
 
-           {/* TAB 3: ARCADE MINIGAME HUB */}
-          {activeTab === 'games' && (
-            <div className="space-y-6 max-w-4xl mx-auto pt-4">
-              
-              {/* Arcade Interactive Sub-Header bar */}
-              <div className="bg-emerald-500 text-white px-6 py-4 rounded-2xl flex justify-between items-center shadow-md">
-                <div className="flex items-center gap-3">
-                  {currentGame !== 'menu' && (
-                    <button 
-                      onClick={() => setCurrentGame('menu')}
-                      className="bg-white/20 hover:bg-white/30 text-white font-bold text-xs px-3 py-1.5 rounded-xl transition-all"
-                    >
-                      ⬅ Back to Arcade Menu
-                    </button>
-                  )}
-                  <span className="font-black text-lg">🎈 Star Arcade Zone</span>
+            {/* TAB 3: ARCADE MINIGAME HUB */}
+            {activeTab === 'games' && (
+              <div className="space-y-6 max-w-4xl mx-auto pt-4">
+
+                {/* Arcade Interactive Sub-Header bar */}
+                <div className="bg-emerald-500 text-white px-6 py-4 rounded-2xl flex justify-between items-center shadow-md">
+                  <div className="flex items-center gap-3">
+                    {currentGame !== 'menu' && (
+                      <button
+                        onClick={() => setCurrentGame('menu')}
+                        className="bg-white/20 hover:bg-white/30 text-white font-bold text-xs px-3 py-1.5 rounded-xl transition-all"
+                      >
+                        ⬅ Back to Arcade Menu
+                      </button>
+                    )}
+                    <span className="font-black text-lg">🎈 Star Arcade Zone</span>
+                  </div>
+                  <span className="bg-white text-emerald-600 font-extrabold px-3 py-1 rounded-full text-sm">
+                    My Score: {score} pts
+                  </span>
                 </div>
-                <span className="bg-white text-emerald-600 font-extrabold px-3 py-1 rounded-full text-sm">
-                  My Score: {score} pts
-                </span>
+
+                {/* VIEW 1: CENTRAL ARCADE CHOOSE MENU */}
+                {currentGame === 'menu' && (
+                  <div className="space-y-4">
+                    <div className="bg-white p-5 rounded-2xl border-4 border-slate-100 text-center sm:text-left">
+                      <h3 className="font-black text-xl text-slate-700">Choose Your Game Challenge!</h3>
+                      <p className="text-xs font-medium text-slate-400 mt-0.5">Pick a magical game track to level up your scores.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      {/* Game Choice Card 1: Word Scramble */}
+                      <div className="bg-white rounded-2xl p-5 border-3 border-emerald-200 shadow-sm flex flex-col justify-between items-start gap-4">
+                        <div>
+                          <span className="text-4xl">🔠</span>
+                          <h4 className="font-black text-lg text-slate-700 mt-2">Word Scramble Puzzles</h4>
+                          <p className="text-xs text-slate-400 font-medium mt-1">Unscramble mixed-up letters to find hidden words and unlock massive vocab secrets!</p>
+                        </div>
+                        <button
+                          onClick={() => setCurrentGame('scramble')}
+                          className="w-full bg-emerald-400 border-b-4 border-emerald-600 text-white font-black py-2.5 rounded-xl text-sm shadow-md hover:bg-emerald-500 transition-all text-center"
+                        >
+                          Play Word Game 🚀
+                        </button>
+                      </div>
+
+                      {/* Game Choice Card 2: Math Sprint */}
+                      <div className="bg-white rounded-2xl p-5 border-3 border-amber-200 shadow-sm flex flex-col justify-between items-start gap-4">
+                        <div>
+                          <span className="text-4xl">⚡</span>
+                          <h4 className="font-black text-lg text-slate-700 mt-2">Math Sprint Blitz</h4>
+                          <p className="text-xs text-slate-400 font-medium mt-1">Test your math superpowers! Solve rapid addition and subtraction problems to stack high win streaks.</p>
+                        </div>
+                        <button
+                          onClick={() => setCurrentGame('math')}
+                          className="w-full bg-amber-400 border-b-4 border-amber-600 text-white font-black py-2.5 rounded-xl text-sm shadow-md hover:bg-amber-500 transition-all text-center"
+                        >
+                          Play Math Blitz 🎯
+                        </button>
+                      </div>
+
+                      {/* Game Choice Card 3: Spelling Bee */}
+                      <div className="bg-white rounded-2xl p-5 border-3 border-indigo-200 shadow-sm flex flex-col justify-between items-start gap-4">
+                        <div>
+                          <span className="text-4xl">🐝</span>
+                          <h4 className="font-black text-lg text-slate-700 mt-2">Spelling Bee Magic</h4>
+                          <p className="text-xs text-slate-400 font-medium mt-1">Listen to standard spoken voice modulations and check your typing accuracy. Perfect for practicing audio phonics!</p>
+                        </div>
+                        <button
+                          onClick={() => setCurrentGame('bee')}
+                          className="w-full bg-indigo-500 border-b-4 border-indigo-700 text-white font-black py-2.5 rounded-xl text-sm shadow-md hover:bg-indigo-600 transition-all text-center"
+                        >
+                          Play Spelling Bee 🎧
+                        </button>
+                      </div>
+
+
+                      {/* Game Choice Card 4: Clock Master */}
+                      <div className="bg-white rounded-2xl p-5 border-3 border-amber-200 shadow-sm flex flex-col justify-between items-start gap-4">
+                        <div>
+                          <span className="text-4xl">⏰</span>
+                          <h4 className="font-black text-lg text-slate-700 mt-2">Clock Master Time</h4>
+                          <p className="text-xs text-slate-400 font-medium mt-1">Practice reading interactive analog clock needles to level up real-world matching competencies!</p>
+                        </div>
+                        <button
+                          onClick={() => setCurrentGame('clock')}
+                          className="w-full bg-amber-400 border-b-4 border-amber-600 text-white font-black py-2.5 rounded-xl text-sm shadow-md hover:bg-amber-500 transition-all text-center"
+                        >
+                          Play Clock Master ⏰
+                        </button>
+                      </div>
+
+
+                    </div>
+                  </div>
+                )}
+
+                {/* VIEW 2: WORD GAME RENDER VIEW */}
+                {currentGame === 'scramble' && (
+                  <WordGame onAwardPoints={(points) => setScore(prev => prev + points)} />
+                )}
+
+                {/* VIEW 3: MATH SPRINT RENDER VIEW */}
+                {currentGame === 'math' && (
+                  <MathSprint onAwardPoints={(points) => setScore(prev => prev + points)} />
+                )}
+                {/* 🌟 ADD THIS: VIEW 4: SPELLING BEE AUDIO QUEST */}
+                {currentGame === 'bee' && (
+                  <SpellingBee onAwardPoints={(points) => setScore(prev => prev + points)} />
+                )}
+                 {/* 🌟 ADD THIS: VIEW 5: Clock Master */}
+                {currentGame === 'clock' && (
+                  <ClockMaster onAwardPoints={(points) => setScore(prev => prev + points)} />
+                )}
+
               </div>
-
-              {/* VIEW 1: CENTRAL ARCADE CHOOSE MENU */}
-              {currentGame === 'menu' && (
-                <div className="space-y-4">
-                  <div className="bg-white p-5 rounded-2xl border-4 border-slate-100 text-center sm:text-left">
-                    <h3 className="font-black text-xl text-slate-700">Choose Your Game Challenge!</h3>
-                    <p className="text-xs font-medium text-slate-400 mt-0.5">Pick a magical game track to level up your scores.</p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {/* Game Choice Card 1: Word Scramble */}
-                    <div className="bg-white rounded-2xl p-5 border-3 border-emerald-200 shadow-sm flex flex-col justify-between items-start gap-4">
-                      <div>
-                        <span className="text-4xl">🔠</span>
-                        <h4 className="font-black text-lg text-slate-700 mt-2">Word Scramble Puzzles</h4>
-                        <p className="text-xs text-slate-400 font-medium mt-1">Unscramble mixed-up letters to find hidden words and unlock massive vocab secrets!</p>
-                      </div>
-                      <button 
-                        onClick={() => setCurrentGame('scramble')}
-                        className="w-full bg-emerald-400 border-b-4 border-emerald-600 text-white font-black py-2.5 rounded-xl text-sm shadow-md hover:bg-emerald-500 transition-all text-center"
-                      >
-                        Play Word Game 🚀
-                      </button>
-                    </div>
-
-                    {/* Game Choice Card 2: Math Sprint */}
-                    <div className="bg-white rounded-2xl p-5 border-3 border-amber-200 shadow-sm flex flex-col justify-between items-start gap-4">
-                      <div>
-                        <span className="text-4xl">⚡</span>
-                        <h4 className="font-black text-lg text-slate-700 mt-2">Math Sprint Blitz</h4>
-                        <p className="text-xs text-slate-400 font-medium mt-1">Test your math superpowers! Solve rapid addition and subtraction problems to stack high win streaks.</p>
-                      </div>
-                      <button 
-                        onClick={() => setCurrentGame('math')}
-                        className="w-full bg-amber-400 border-b-4 border-amber-600 text-white font-black py-2.5 rounded-xl text-sm shadow-md hover:bg-amber-500 transition-all text-center"
-                      >
-                        Play Math Blitz 🎯
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* VIEW 2: WORD GAME RENDER VIEW */}
-              {currentGame === 'scramble' && (
-                <WordGame onAwardPoints={(points) => setScore(prev => prev + points)} />
-              )}
-
-              {/* VIEW 3: MATH SPRINT RENDER VIEW */}
-              {currentGame === 'math' && (
-                <MathSprint onAwardPoints={(points) => setScore(prev => prev + points)} />
-              )}
-
-            </div>
-          )}
+            )}
 
             {activeTab === 'awards' && (
               <div className="space-y-6 max-w-4xl mx-auto pt-4">
@@ -304,7 +347,7 @@ const [currentGame, setCurrentGame] = useState('menu'); // 'menu', 'scramble', o
           </div>
 
         </main>
- 
+
       </div>
     </div>
 
